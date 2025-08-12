@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo Club "Mucho Texto"</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .participant-section {
+            margin-bottom: 30px;
+        }
+        
+        .participant-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .participant-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .participant-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,107,107,0.3);
+        }
+        
+        .participant-btn.selected {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            animation: pulse 1s infinite;
+        }
+        
+        .participant-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .sorteo-btn {
+            background: linear-gradient(45deg, #ffd89b, #19547b);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .sorteo-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(25,84,123,0.3);
+        }
+        
+        .sorteo-btn.show {
+            display: inline-block;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .arrow {
+            color: #ff6b6b;
+            font-size: 20px;
+            margin: 0 10px;
+        }
+        
+        .status {
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .waiting {
+            color: #ffa726;
+        }
+        
+        .ready {
+            color: #66bb6a;
+        }
+        
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 SORTEO CLUB "MUCHO TEXTO"</h1>
+        <p class="subtitle">Intercambio de libros - 13 de Septiembre</p>
+        
+        <div class="instructions">
+            <strong>¿Cómo funciona?</strong><br>
+            1️⃣ Cada uno selecciona su nombre<br>
+            2️⃣ Cuando todos estén listos, hacemos el sorteo<br>
+            3️⃣ ¡Descubrimos a quién le toca regalar a quién!
+        </div>
+        
+        <div class="participant-section">
+            <div class="participant-buttons">
+                <button class="participant-btn" data-name="Martin">Martin</button>
+                <button class="participant-btn" data-name="Justo">Justo</button>
+                <button class="participant-btn" data-name="Fede">Fede</button>
+                <button class="participant-btn" data-name="Josefina">Josefina</button>
+                <button class="participant-btn" data-name="Kevin">Kevin</button>
+            </div>
+            
+            <div class="status waiting" id="status">
+                Esperando que todos seleccionen su nombre...
+            </div>
+            
+            <button class="sorteo-btn" id="sorteoBtn">
+                🎲 ¡HACER SORTEO!
+            </button>
+        </div>
+        
+        <div class="results" id="results">
+            <h3>🎁 RESULTADO DEL SORTEO</h3>
+            <div id="resultsList"></div>
+            <button class="reset-btn" onclick="resetSorteo()">Nuevo Sorteo</button>
+        </div>
+    </div>
+
+    <script>
+        const participants = ['Martin', 'Justo', 'Fede', 'Josefina', 'Kevin'];
+        let selectedParticipants = [];
+        
+        // Event listeners para botones de participantes
+        document.querySelectorAll('.participant-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const name = this.dataset.name;
+                
+                if (this.classList.contains('selected')) {
+                    // Deseleccionar
+                    this.classList.remove('selected');
+                    selectedParticipants = selectedParticipants.filter(p => p !== name);
+                } else {
+                    // Seleccionar
+                    this.classList.add('selected');
+                    selectedParticipants.push(name);
+                }
+                
+                updateStatus();
+            });
+        });
+        
+        // Actualizar estado
+        function updateStatus() {
+            const statusEl = document.getElementById('status');
+            const sorteoBtn = document.getElementById('sorteoBtn');
+            
+            if (selectedParticipants.length === 0) {
+                statusEl.textContent = 'Esperando que todos seleccionen su nombre...';
+                statusEl.className = 'status waiting';
+                sorteoBtn.classList.remove('show');
+            } else if (selectedParticipants.length < 5) {
+                statusEl.textContent = `${selectedParticipants.length}/5 participantes listos`;
+                statusEl.className = 'status waiting';
+                sorteoBtn.classList.remove('show');
+            } else {
+                statusEl.textContent = '¡Todos listos! 🎉';
+                statusEl.className = 'status ready';
+                sorteoBtn.classList.add('show');
+            }
+        }
+        
+        // Función de sorteo
+        function hacerSorteo() {
+            if (selectedParticipants.length !== 5) return;
+            
+            let intentos = 0;
+            let sorteoValido = false;
+            let receptores = [];
+            
+            while (!sorteoValido && intentos < 1000) {
+                receptores = [...selectedParticipants];
+                
+                // Mezclar array
+                for (let i = receptores.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [receptores[i], receptores[j]] = [receptores[j], receptores[i]];
+                }
+                
+                // Verificar que nadie se regale a sí mismo
+                sorteoValido = true;
+                for (let i = 0; i < selectedParticipants.length; i++) {
+                    if (selectedParticipants[i] === receptores[i]) {
+                        sorteoValido = false;
+                        break;
+                    }
+                }
+                
+                intentos++;
+            }
+            
+            if (sorteoValido) {
+                mostrarResultados(selectedParticipants, receptores);
+            } else {
+                alert('Error en el sorteo. Intenta nuevamente.');
+            }
+        }
+        
+        // Mostrar resultados
+        function mostrarResultados(regaladores, receptores) {
+            const resultsEl = document.getElementById('results');
+            const resultsListEl = document.getElementById('resultsList');
+            
+            resultsListEl.innerHTML = '';
+            
+            for (let i = 0; i < regaladores.length; i++) {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    ${regaladores[i]} <span class="arrow">→</span> ${receptores[i]}
+                `;
+                resultsListEl.appendChild(resultItem);
+            }
+            
+            resultsEl.classList.add('show');
+            
+            // Ocultar botones de participantes
+            document.querySelector('.participant-section').style.display = 'none';
+        }
+        
+        // Reset sorteo
+        function resetSorteo() {
+            selectedParticipants = [];
+            document.querySelectorAll('.participant-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('results').classList.remove('show');
+            document.querySelector('.participant-section').style.display = 'block';
+            updateStatus();
+        }
+        
+        // Event listener para botón de sorteo
+        document.getElementById('sorteoBtn').addEventListener('click', hacerSorteo);
+        
+        // Inicializar
+        updateStatus();
+    </script>
+</body>
+</html>
